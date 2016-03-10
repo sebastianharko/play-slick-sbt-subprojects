@@ -26,13 +26,11 @@ class Module extends AbstractModule {
     // Set AtomicCounter as the implementation for Counter.
     bind(classOf[Counter]).to(classOf[AtomicCounter])
 
-
-    // Database connection init code here
-    val databaseConnection = ???
-    bind(classOf[CoffeeRepository]).toInstance {
-      new CoffeeRepository(databaseConnection)
-    }
-
+    // Potentially - database connection init operations code can go here
+    // val databaseConnection = ???
+    // bind(classOf[CoffeeRepository]).toInstance {
+    //   new CoffeeRepository(databaseConnection)
+    // }
 
   }
 
