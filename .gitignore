@@ -1,0 +1,5 @@
+target/
+*/target*
+*.log
+logs
+.sbtserver*
