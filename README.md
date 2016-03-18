@@ -19,3 +19,10 @@ sbt
 > genTables
 > compile
 ```
+
+Swagger
+=======
+```
+http://localhost:9000/docs/swagger-ui/index.html?url=/docs/swagger.json
+```
+

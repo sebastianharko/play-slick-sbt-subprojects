@@ -3,13 +3,25 @@
 # ~~~~
 
 # An example controller showing a sample home page
+### NoDocs ###
 GET     /                           controllers.HomeController.index
-# An example controller showing how to use dependency injection
-GET     /count                      controllers.CountController.count
-GET     /people                     controllers.CountController.countPeople
-
-# An example controller showing how to write asynchronous code
-GET     /message                    controllers.AsyncController.message
 
 # Map static resources from the /public folder to the /assets URL path
+### NoDocs ###
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+###
+#  summary: get a list of servers
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/com.seb.model.ServerGetList'
+###
+GET     /servers                   controllers.HomeController.getServers
+
+### NoDocs ###
+GET   /docs/swagger.json            controllers.ApiSpecs.specs
+
+### NoDocs ###
+GET   /docs/swagger-ui/*file        controllers.Assets.at(path:String="/public/lib/swagger-ui", file:String)

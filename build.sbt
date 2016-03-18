@@ -9,10 +9,20 @@ val commonSettings = Seq(
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 )
 
+resolvers += Resolver.jcenterRepo
+
+lazy val scalazDependency = "org.scalaz" %% "scalaz-core" % "7.2.1"
+
+lazy val playSlickDependency = "com.typesafe.play" %% "play-slick" % "2.0.0"
+
 lazy val dbDependencies = Seq(
   "com.typesafe.slick" %% "slick" % "3.0.1",
   "com.typesafe.slick" %% "slick-codegen" % "3.0.1",
-  "com.h2database" % "h2" % "1.4.187"
+  "com.h2database" % "h2" % "1.4.187",
+  "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
+  "com.github.cb372" % "scalacache-core_2.11" % "0.7.5",
+  "com.github.cb372" % "scalacache-guava_2.11" % "0.7.5",
+  playSlickDependency
 )
 
 lazy val testDependencies = Seq (
@@ -21,7 +31,13 @@ lazy val testDependencies = Seq (
 
 lazy val playDependencies = Seq (
   cache,
-  ws
+  ws,
+  "org.json4s" % "json4s-core_2.11" % "3.3.0",
+  "org.json4s" % "json4s-jackson_2.11" % "3.3.0",
+  playSlickDependency,
+  "com.iheart" %% "play-swagger" % "0.2.1-PLAY2.5",
+  "org.webjars" % "swagger-ui" % "2.1.4",
+  scalazDependency
 )
 
 lazy val db = project.in(file("db"))

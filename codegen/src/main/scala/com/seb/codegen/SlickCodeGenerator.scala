@@ -2,14 +2,12 @@ package com.seb.codegen
 
 object Config{
   // connection info for a pre-populated throw-away, in-memory db for this demo, which is freshly initialized on every run
-  val initScripts = Seq("drop-tables.sql","create-tables.sql","populate-tables.sql")
-  val url = "jdbc:h2:mem:test;INIT="+initScripts.map("runscript from 'codegen/src/sql/"+_+"'").mkString("\\;")
-  val jdbcDriver = "org.h2.Driver"
-  val slickProfile = slick.driver.H2Driver
+  val url = "jdbc:postgresql://test.cx5oybgdkpqs.us-west-2.rds.amazonaws.com:5432/test?user=root&password=twistandshout"
+  val jdbcDriver = "org.postgresql.Driver"
+  val slickProfile = slick.driver.PostgresDriver
 }
 
-import slick.model.Model
-import slick.driver.H2Driver
+import slick.driver.PostgresDriver
 import Config._
 import scala.concurrent._
 import scala.concurrent.duration._
@@ -24,7 +22,7 @@ object CustomizedCodeGenerator{
 
     Await.ready(
       codegen.map(_.writeToFile(
-        "slick.driver.H2Driver",
+        "slick.driver.PostgresDriver",
         args(0),
         "com.seb.db",
         "Tables",
@@ -34,11 +32,11 @@ object CustomizedCodeGenerator{
     )
   }
 
-  val db = H2Driver.api.Database.forURL(url,driver=jdbcDriver)
+  val db = PostgresDriver.api.Database.forURL(url,driver=jdbcDriver)
   // filter out desired tables
   val included = Seq("COFFEES","SUPPLIERS","COF_INVENTORY")
   val codegen = db.run{
-    H2Driver.defaultTables.map(_.filter(t => included contains t.name.name)).flatMap( H2Driver.createModelBuilder(_,false).buildModel )
+    PostgresDriver.defaultTables.map(_.filterNot(t => included contains t.name.name)).flatMap( PostgresDriver.createModelBuilder(_,false).buildModel )
   }.map{ model =>
     new slick.codegen.SourceCodeGenerator(model){
       // customize Scala entity name (case class, etc.)

@@ -2,7 +2,7 @@ package com.seb.db
 // AUTO-GENERATED Slick data model
 /** Stand-alone Slick data model for immediate use */
 object Tables extends {
-  val profile = slick.driver.H2Driver
+  val profile = slick.driver.PostgresDriver
 } with Tables
 
 /** Slick data model trait for extension, choice of backend or usage in the cake pattern. (Make sure to initialize this late.) */
@@ -14,114 +14,91 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema = coffeeInventory.schema ++ coffees.schema ++ suppliers.schema
+  lazy val schema = apps.schema ++ container.schema ++ server.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
-  /** Entity class storing rows of table coffeeInventory
-   *  @param warehouseId Database column WAREHOUSE_ID SqlType(INTEGER)
-   *  @param coffeeName Database column COF_NAME SqlType(VARCHAR), Length(32,true)
-   *  @param supId Database column SUP_ID SqlType(INTEGER)
-   *  @param quantity Database column QUAN SqlType(INTEGER)
-   *  @param dateVal Database column DATE_VAL SqlType(TIMESTAMP) */
-  case class CoffeeInventoryItem(warehouseId: Int, coffeeName: String, supId: Int, quantity: Int, dateVal: Option[java.sql.Timestamp])
-  /** GetResult implicit for fetching CoffeeInventoryItem objects using plain SQL queries */
-  implicit def GetResultCoffeeInventoryItem(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[java.sql.Timestamp]]): GR[CoffeeInventoryItem] = GR{
+  /** Entity class storing rows of table apps
+   *  @param id Database column id SqlType(int4), PrimaryKey
+   *  @param name Database column name SqlType(varchar)
+   *  @param port Database column port SqlType(int4)
+   *  @param containerId Database column container_id SqlType(int4) */
+  case class AppsRow(id: Int, name: String, port: Int, containerId: Int)
+  /** GetResult implicit for fetching AppsRow objects using plain SQL queries */
+  implicit def GetResultAppsRow(implicit e0: GR[Int], e1: GR[String]): GR[AppsRow] = GR{
     prs => import prs._
-    CoffeeInventoryItem.tupled((<<[Int], <<[String], <<[Int], <<[Int], <<?[java.sql.Timestamp]))
+    AppsRow.tupled((<<[Int], <<[String], <<[Int], <<[Int]))
   }
-  /** Table description of table COF_INVENTORY. Objects of this class serve as prototypes for rows in queries. */
-  class CoffeeInventory(_tableTag: Tag) extends Table[CoffeeInventoryItem](_tableTag, "COF_INVENTORY") {
-    def * = (warehouseId, coffeeName, supId, quantity, dateVal) <> (CoffeeInventoryItem.tupled, CoffeeInventoryItem.unapply)
+  /** Table description of table Apps. Objects of this class serve as prototypes for rows in queries. */
+  class Apps(_tableTag: Tag) extends Table[AppsRow](_tableTag, "Apps") {
+    def * = (id, name, port, containerId) <> (AppsRow.tupled, AppsRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(warehouseId), Rep.Some(coffeeName), Rep.Some(supId), Rep.Some(quantity), dateVal).shaped.<>({r=>import r._; _1.map(_=> CoffeeInventoryItem.tupled((_1.get, _2.get, _3.get, _4.get, _5)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(port), Rep.Some(containerId)).shaped.<>({r=>import r._; _1.map(_=> AppsRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
-    /** Database column WAREHOUSE_ID SqlType(INTEGER) */
-    val warehouseId: Rep[Int] = column[Int]("WAREHOUSE_ID")
-    /** Database column COF_NAME SqlType(VARCHAR), Length(32,true) */
-    val coffeeName: Rep[String] = column[String]("COF_NAME", O.Length(32,varying=true))
-    /** Database column SUP_ID SqlType(INTEGER) */
-    val supId: Rep[Int] = column[Int]("SUP_ID")
-    /** Database column QUAN SqlType(INTEGER) */
-    val quantity: Rep[Int] = column[Int]("QUAN")
-    /** Database column DATE_VAL SqlType(TIMESTAMP) */
-    val dateVal: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("DATE_VAL")
+    /** Database column id SqlType(int4), PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.PrimaryKey)
+    /** Database column name SqlType(varchar) */
+    val name: Rep[String] = column[String]("name")
+    /** Database column port SqlType(int4) */
+    val port: Rep[Int] = column[Int]("port")
+    /** Database column container_id SqlType(int4) */
+    val containerId: Rep[Int] = column[Int]("container_id")
 
-    /** Foreign key referencing coffees (database name CONSTRAINT_5) */
-    lazy val coffeesFk = foreignKey("CONSTRAINT_5", coffeeName, coffees)(r => r.name, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Restrict)
-    /** Foreign key referencing suppliers (database name CONSTRAINT_57) */
-    lazy val suppliersFk = foreignKey("CONSTRAINT_57", supId, suppliers)(r => r.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Restrict)
+    /** Foreign key referencing container (database name fk_Apps_Container_1) */
+    lazy val containerFk = foreignKey("fk_Apps_Container_1", containerId, container)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
-  /** Collection-like TableQuery object for table coffeeInventory */
-  lazy val coffeeInventory = new TableQuery(tag => new CoffeeInventory(tag))
+  /** Collection-like TableQuery object for table apps */
+  lazy val apps = new TableQuery(tag => new Apps(tag))
 
-  /** Entity class storing rows of table coffees
-   *  @param name Database column COF_NAME SqlType(VARCHAR), PrimaryKey, Length(32,true)
-   *  @param supplierId Database column SUP_ID SqlType(INTEGER)
-   *  @param price Database column PRICE SqlType(DECIMAL)
-   *  @param sales Database column SALES SqlType(INTEGER)
-   *  @param total Database column TOTAL SqlType(INTEGER) */
-  case class Coffee(name: String, supplierId: Int, price: scala.math.BigDecimal, sales: Int, total: Int)
-  /** GetResult implicit for fetching Coffee objects using plain SQL queries */
-  implicit def GetResultCoffee(implicit e0: GR[String], e1: GR[Int], e2: GR[scala.math.BigDecimal]): GR[Coffee] = GR{
+  /** Entity class storing rows of table container
+   *  @param id Database column id SqlType(int4), PrimaryKey
+   *  @param image Database column Image SqlType(varchar)
+   *  @param serverId Database column server_id SqlType(int4) */
+  case class ContainerRow(id: Int, image: String, serverId: Int)
+  /** GetResult implicit for fetching ContainerRow objects using plain SQL queries */
+  implicit def GetResultContainerRow(implicit e0: GR[Int], e1: GR[String]): GR[ContainerRow] = GR{
     prs => import prs._
-    Coffee.tupled((<<[String], <<[Int], <<[scala.math.BigDecimal], <<[Int], <<[Int]))
+    ContainerRow.tupled((<<[Int], <<[String], <<[Int]))
   }
-  /** Table description of table COFFEES. Objects of this class serve as prototypes for rows in queries. */
-  class Coffees(_tableTag: Tag) extends Table[Coffee](_tableTag, "COFFEES") {
-    def * = (name, supplierId, price, sales, total) <> (Coffee.tupled, Coffee.unapply)
+  /** Table description of table Container. Objects of this class serve as prototypes for rows in queries. */
+  class Container(_tableTag: Tag) extends Table[ContainerRow](_tableTag, "Container") {
+    def * = (id, image, serverId) <> (ContainerRow.tupled, ContainerRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(name), Rep.Some(supplierId), Rep.Some(price), Rep.Some(sales), Rep.Some(total)).shaped.<>({r=>import r._; _1.map(_=> Coffee.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(image), Rep.Some(serverId)).shaped.<>({r=>import r._; _1.map(_=> ContainerRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
-    /** Database column COF_NAME SqlType(VARCHAR), PrimaryKey, Length(32,true) */
-    val name: Rep[String] = column[String]("COF_NAME", O.PrimaryKey, O.Length(32,varying=true))
-    /** Database column SUP_ID SqlType(INTEGER) */
-    val supplierId: Rep[Int] = column[Int]("SUP_ID")
-    /** Database column PRICE SqlType(DECIMAL) */
-    val price: Rep[scala.math.BigDecimal] = column[scala.math.BigDecimal]("PRICE")
-    /** Database column SALES SqlType(INTEGER) */
-    val sales: Rep[Int] = column[Int]("SALES")
-    /** Database column TOTAL SqlType(INTEGER) */
-    val total: Rep[Int] = column[Int]("TOTAL")
+    /** Database column id SqlType(int4), PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.PrimaryKey)
+    /** Database column Image SqlType(varchar) */
+    val image: Rep[String] = column[String]("Image")
+    /** Database column server_id SqlType(int4) */
+    val serverId: Rep[Int] = column[Int]("server_id")
 
-    /** Foreign key referencing suppliers (database name CONSTRAINT_63) */
-    lazy val suppliersFk = foreignKey("CONSTRAINT_63", supplierId, suppliers)(r => r.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Restrict)
+    /** Foreign key referencing server (database name fk_Container_Server_1) */
+    lazy val serverFk = foreignKey("fk_Container_Server_1", serverId, server)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
-  /** Collection-like TableQuery object for table coffees */
-  lazy val coffees = new TableQuery(tag => new Coffees(tag))
+  /** Collection-like TableQuery object for table container */
+  lazy val container = new TableQuery(tag => new Container(tag))
 
-  /** Entity class storing rows of table suppliers
-   *  @param id Database column SUP_ID SqlType(INTEGER), AutoInc, PrimaryKey
-   *  @param name Database column SUP_NAME SqlType(VARCHAR), Length(40,true)
-   *  @param street Database column STREET SqlType(VARCHAR), Length(40,true)
-   *  @param city Database column CITY SqlType(VARCHAR), Length(20,true)
-   *  @param state Database column STATE SqlType(CHAR), Length(2,false)
-   *  @param zip Database column ZIP SqlType(CHAR), Length(5,false) */
-  case class Supplier(id: Int, name: String, street: String, city: String, state: String, zip: Option[String])
-  /** GetResult implicit for fetching Supplier objects using plain SQL queries */
-  implicit def GetResultSupplier(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]]): GR[Supplier] = GR{
+  /** Entity class storing rows of table server
+   *  @param id Database column id SqlType(int4), PrimaryKey
+   *  @param name Database column name SqlType(varchar) */
+  case class ServerRow(id: Int, name: String)
+  /** GetResult implicit for fetching ServerRow objects using plain SQL queries */
+  implicit def GetResultServerRow(implicit e0: GR[Int], e1: GR[String]): GR[ServerRow] = GR{
     prs => import prs._
-    Supplier.tupled((<<[Int], <<[String], <<[String], <<[String], <<[String], <<?[String]))
+    ServerRow.tupled((<<[Int], <<[String]))
   }
-  /** Table description of table SUPPLIERS. Objects of this class serve as prototypes for rows in queries. */
-  class Suppliers(_tableTag: Tag) extends Table[Supplier](_tableTag, "SUPPLIERS") {
-    def * = (id, name, street, city, state, zip) <> (Supplier.tupled, Supplier.unapply)
+  /** Table description of table Server. Objects of this class serve as prototypes for rows in queries. */
+  class Server(_tableTag: Tag) extends Table[ServerRow](_tableTag, "Server") {
+    def * = (id, name) <> (ServerRow.tupled, ServerRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(street), Rep.Some(city), Rep.Some(state), zip).shaped.<>({r=>import r._; _1.map(_=> Supplier.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(name)).shaped.<>({r=>import r._; _1.map(_=> ServerRow.tupled((_1.get, _2.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
-    /** Database column SUP_ID SqlType(INTEGER), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("SUP_ID", O.AutoInc, O.PrimaryKey)
-    /** Database column SUP_NAME SqlType(VARCHAR), Length(40,true) */
-    val name: Rep[String] = column[String]("SUP_NAME", O.Length(40,varying=true))
-    /** Database column STREET SqlType(VARCHAR), Length(40,true) */
-    val street: Rep[String] = column[String]("STREET", O.Length(40,varying=true))
-    /** Database column CITY SqlType(VARCHAR), Length(20,true) */
-    val city: Rep[String] = column[String]("CITY", O.Length(20,varying=true))
-    /** Database column STATE SqlType(CHAR), Length(2,false) */
-    val state: Rep[String] = column[String]("STATE", O.Length(2,varying=false))
-    /** Database column ZIP SqlType(CHAR), Length(5,false) */
-    val zip: Rep[Option[String]] = column[Option[String]]("ZIP", O.Length(5,varying=false))
+    /** Database column id SqlType(int4), PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.PrimaryKey)
+    /** Database column name SqlType(varchar) */
+    val name: Rep[String] = column[String]("name")
   }
-  /** Collection-like TableQuery object for table suppliers */
-  lazy val suppliers = new TableQuery(tag => new Suppliers(tag))
+  /** Collection-like TableQuery object for table server */
+  lazy val server = new TableQuery(tag => new Server(tag))
 }

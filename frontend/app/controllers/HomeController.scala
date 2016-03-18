@@ -1,25 +1,60 @@
 package controllers
 
 import javax.inject._
-import com.seb.db.CoffeeRepository
-import play.api._
+
+import _root_.util.{Support4Json4s, UnauthorizedException, UsefulImplicits}
+import com.seb.db.{ServerRepository, UserRepository}
+import com.seb.model.ServerGet
+import org.json4s.jackson.Serialization.write
+import play.api.cache.Cached
 import play.api.mvc._
 
-/**
- * This controller creates an `Action` to handle HTTP requests to the
- * application's home page.
- */
-@Singleton
-class HomeController @Inject() extends Controller {
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Random
 
-  /**
-   * Create an Action to render an HTML page with a welcome message.
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/`.
-   */
+@Singleton
+class HomeController @Inject() (userRepository: UserRepository, serverRepository: ServerRepository)(implicit exec: ExecutionContext) extends
+  Controller with Support4Json4s with UsefulImplicits {
+
   def index = Action {
-    Ok(views.html.index("Your ~~~ application is ready."))
+    Ok(views.html.index("Your awesome application is ready."))
   }
+
+  def getServers = Action.async {
+
+    val userId = Random.nextInt() // assume we get this from JWT claim
+
+    val result = for {
+      user <- userRepository.getUser(userId)
+      canListServers <- user.canListServers
+      list <- serverRepository.getServers()
+    } yield list
+
+    result.map {
+      (serverList: Seq[ServerGet]) => Ok(write(serverList)).as("application/json")
+    }.recover {
+      case e: UnauthorizedException => Unauthorized(write("error" -> "you are not allowed to get the server list")).as("application/json")
+      case _ => InternalServerError
+    }
+
+  }
+
+}
+
+import com.iheart.playSwagger.SwaggerSpecGenerator
+import play.api.libs.concurrent.Execution.Implicits._
+
+@Singleton
+class ApiSpecs @Inject() (cached: Cached) extends Controller {
+  implicit val cl = getClass.getClassLoader
+
+  val domainPackage = "com.seb.model"
+  private lazy val generator = SwaggerSpecGenerator(domainPackage)
+
+  def specs =
+    Action.async { _ =>
+      Future.fromTry(generator.generate()).map(Ok(_)) //generate() can also taking in an optional arg of the route file name.
+    }
+
 
 }
