@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: com.github.cb372:scalacache-core_2.11:0.7.5:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.github.cb372/scalacache-core_2.11/jars/scalacache-core_2.11-0.7.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.github.cb372/scalacache-core_2.11/srcs/scalacache-core_2.11-0.7.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
