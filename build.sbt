@@ -78,7 +78,9 @@ lazy val frontend = project.in(file("frontend"))
   .dependsOn(db)
 
 /* use Slick from Scala console like this:
-
+$ sbt
+> project frontend
+[frontend] $ console
 scala> val basicQuery = { for { s <- server } yield s }
 basicQuery: slick.lifted.Query[com.seb.db.Tables.Server,com.seb.db.Tables.ServerRow,Seq] = Rep(Bind)
 scala> val r = db.run(basicQuery.result)
