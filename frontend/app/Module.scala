@@ -8,6 +8,7 @@ import services.{ApplicationTimer, AtomicCounter, Counter}
 import scalacache.ScalaCache
 
 
+
 class Module extends AbstractModule {
 
   override def configure() = {

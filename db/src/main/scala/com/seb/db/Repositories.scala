@@ -1,9 +1,7 @@
 package com.seb.db
 
-import java.util.UUID
-
 import com.seb.db.Tables._
-import com.seb.model.{User, ServerGet}
+import com.seb.model.{ServerGet, User}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import slick.driver.JdbcProfile
@@ -15,7 +13,7 @@ class ServerRepository(val dbConfigProvider: DatabaseConfigProvider) extends Has
 
   import driver.api._
 
-  def getServers(nameFilter: Option[String] = None): Future[Seq[ServerGet]] = {
+  def getServers(nameFilter: Option[String] = None, clientId: Int): Future[Seq[ServerGet]] = {
 
     val basicQuery = { for { s <- server } yield s }
 
@@ -26,22 +24,20 @@ class ServerRepository(val dbConfigProvider: DatabaseConfigProvider) extends Has
     }
   }
 
-
-
 }
 
 class UserRepository(val dbConfigProvider: DatabaseConfigProvider, val scalaCache: ScalaCache) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def getUser(id: Int): Future[User] = {
-    Future.successful(User(id, canListServers = false))
+    Future.successful(User(id, canListServers = true))
   }
 
   class CachedOps {
 
-    import scalacache._
-    import memoization._
     import concurrent.duration._
     import language.postfixOps
+    import scalacache._
+    import memoization._
 
     implicit val scalaCache = UserRepository.this.scalaCache // from outer class
 

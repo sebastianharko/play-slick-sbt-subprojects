@@ -22,12 +22,13 @@ class HomeController @Inject() (userRepository: UserRepository, serverRepository
 
   def getServers = Action.async {
 
-    val userId = Random.nextInt() // assume we get this from JWT claim
+    // same thing as client id
+    val userId = Random.nextInt() // assume we get this from JWT claim set
 
     val result = for {
       user <- userRepository.getUser(userId)
       canListServers <- user.canListServers
-      list <- serverRepository.getServers()
+      list <- serverRepository.getServers(None, userId)
     } yield list
 
     result.map {

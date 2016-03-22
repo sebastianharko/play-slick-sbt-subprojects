@@ -10,12 +10,14 @@ class UnauthorizedException(message: String = null) extends Exception
 
 trait UsefulImplicits {
 
+
   implicit def boolean2future4auth(v: Boolean): Future[Unit] = {
     v match {
       case true => Future.successful()
       case false => Future.failed(new UnauthorizedException)
     }
   }
+
 
 }
 

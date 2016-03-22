@@ -9,6 +9,7 @@ val commonSettings = Seq(
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 )
 
+
 resolvers += Resolver.jcenterRepo
 
 lazy val scalazDependency = "org.scalaz" %% "scalaz-core" % "7.2.1"
@@ -61,9 +62,31 @@ lazy val slickCodeGenTask = (sourceManaged, dependencyClasspath in Compile, runn
 
 lazy val frontend = project.in(file("frontend"))
   .settings(commonSettings:_*)
+  .settings(initialCommands in console :=
+    """import com.typesafe.config.ConfigFactory;
+      |import slick.jdbc.JdbcBackend.Database;
+      |val config = ConfigFactory.load();
+      |val db = Database.forURL(config.getString("slick.dbs.default.db.url"));
+      |import com.seb.db.Tables._
+      |import slick.driver.PostgresDriver
+      |import slick.driver.PostgresDriver._
+      |import slick.driver.PostgresDriver.api
+      |import slick.driver.PostgresDriver.api._
+      |""".stripMargin)
   .settings(libraryDependencies ++= (testDependencies ++ playDependencies))
   .enablePlugins(PlayScala)
   .dependsOn(db)
+
+/* use Slick from Scala console like this:
+
+scala> val basicQuery = { for { s <- server } yield s }
+basicQuery: slick.lifted.Query[com.seb.db.Tables.Server,com.seb.db.Tables.ServerRow,Seq] = Rep(Bind)
+scala> val r = db.run(basicQuery.result)
+r: scala.concurrent.Future[Seq[com.seb.db.Tables.ServerRow]] = List()
+scala> r.value // wait a bit for the result
+res1: Option[scala.util.Try[Seq[com.seb.db.Tables.ServerRow]]] = Some(Success(Vector(ServerRow(0,Linux), ServerRow(1,Windows))))
+*/
+
 
 lazy val main = project.in(file("."))
   .aggregate(db, frontend)
