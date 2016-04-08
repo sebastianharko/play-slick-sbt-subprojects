@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import _root_.util.{Support4Json4s, UnauthorizedException, UsefulImplicits}
-import com.seb.db.{ServerRepository, UserRepository}
+import com.seb.db.{ServerRepository, UserRepository, ServerRepositoryImpl, UserRepositoryImpl}
 import com.seb.model.ServerGet
 import org.json4s.jackson.Serialization.write
 import play.api.cache.Cached
@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class HomeController @Inject() (userRepository: UserRepository, serverRepository: ServerRepository)(implicit exec: ExecutionContext) extends
+class HomeController @Inject()(userRepository: UserRepository, serverRepository: ServerRepository)(implicit exec: ExecutionContext) extends
   Controller with Support4Json4s with UsefulImplicits {
 
   def index = Action {
@@ -35,7 +35,7 @@ class HomeController @Inject() (userRepository: UserRepository, serverRepository
       (serverList: Seq[ServerGet]) => Ok(write(serverList)).as("application/json")
     }.recover {
       case e: UnauthorizedException => Unauthorized(write("error" -> "you are not allowed to get the server list")).as("application/json")
-      case _ => InternalServerError
+      case _ => InternalServerError(write("error" -> "internal server error"))
     }
 
   }

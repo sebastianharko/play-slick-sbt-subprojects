@@ -38,7 +38,8 @@ lazy val playDependencies = Seq (
   playSlickDependency,
   "com.iheart" %% "play-swagger" % "0.2.1-PLAY2.5",
   "org.webjars" % "swagger-ui" % "2.1.4",
-  scalazDependency
+  scalazDependency,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test"
 )
 
 lazy val db = project.in(file("db"))

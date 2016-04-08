@@ -1,12 +1,11 @@
 import java.time.Clock
 
 import com.google.inject.{Singleton, Provides, AbstractModule}
-import com.seb.db.{UserRepository, ServerRepository}
+import com.seb.db.{ServerRepository, UserRepository, UserRepositoryImpl, ServerRepositoryImpl}
 import play.api.db.slick.DatabaseConfigProvider
 import services.{ApplicationTimer, AtomicCounter, Counter}
 
 import scalacache.ScalaCache
-
 
 
 class Module extends AbstractModule {
@@ -33,13 +32,13 @@ class Module extends AbstractModule {
   @Provides
   @Singleton
   def getServerRepository(dbConfigProvider: DatabaseConfigProvider): ServerRepository = {
-    new ServerRepository(dbConfigProvider)
+    new ServerRepositoryImpl(dbConfigProvider)
   }
 
   @Provides
   @Singleton
   def getUserRepository(dbConfigProvider: DatabaseConfigProvider, scalaCache: ScalaCache): UserRepository = {
-    new UserRepository(dbConfigProvider, scalaCache)
+    new UserRepositoryImpl(dbConfigProvider, scalaCache)
   }
 
 

@@ -9,7 +9,11 @@ import slick.driver.JdbcProfile
 import scala.concurrent.Future
 import scalacache.ScalaCache
 
-class ServerRepository(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile]  {
+trait ServerRepository {
+  def getServers(nameFilter: Option[String] = None, clientId: Int): Future[Seq[ServerGet]]
+}
+
+class ServerRepositoryImpl(val dbConfigProvider: DatabaseConfigProvider) extends ServerRepository with HasDatabaseConfigProvider[JdbcProfile]  {
 
   import driver.api._
 
@@ -26,7 +30,11 @@ class ServerRepository(val dbConfigProvider: DatabaseConfigProvider) extends Has
 
 }
 
-class UserRepository(val dbConfigProvider: DatabaseConfigProvider, val scalaCache: ScalaCache) extends HasDatabaseConfigProvider[JdbcProfile] {
+trait UserRepository {
+  def getUser(id: Int): Future[User]
+}
+
+class UserRepositoryImpl(val dbConfigProvider: DatabaseConfigProvider, val scalaCache: ScalaCache) extends UserRepository with HasDatabaseConfigProvider[JdbcProfile]{
 
   def getUser(id: Int): Future[User] = {
     Future.successful(User(id, canListServers = true))
@@ -39,10 +47,10 @@ class UserRepository(val dbConfigProvider: DatabaseConfigProvider, val scalaCach
     import scalacache._
     import memoization._
 
-    implicit val scalaCache = UserRepository.this.scalaCache // from outer class
+    implicit val scalaCache = UserRepositoryImpl.this.scalaCache // from outer class
 
     def getUser(id: Int): Future[User] = memoize(60 seconds) {
-      UserRepository.this.getUser(id) // from outer class
+      UserRepositoryImpl.this.getUser(id) // from outer class
     }
   }
 
